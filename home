@@ -1,0 +1,106 @@
+// First, the front-end Javascript logic
+let tests = [
+  { 
+    id: 1, 
+    Test: 'Test A for Login', 
+    Parameter: 'Login', 
+    Severity: 'Minor', 
+    severityValue: 1 
+  },
+  { 
+    id: 2, 
+    Test: 'Test B for Login', 
+    Parameter: 'Login', 
+    Severity: 'Major', 
+    severityValue: 2 
+  },
+  // Add more tests...
+];
+
+document.getElementById('testForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const featureName = document.getElementById('featureName').value;
+    const components = [
+        document.getElementById('component1').value,
+        document.getElementById('component2').value,
+        // Add more as needed
+    ].filter(component => component !== '');
+    const count = document.getElementById('count').value;
+    const random = document.getElementById('random').value;
+    const resultsElement = document.getElementById('results');
+    resultsElement.innerHTML = `<h2>${featureName}</h2>`;
+    for (let component of components) {
+        let filteredTests = tests.filter(test => test.Parameter === component);
+        if (random === 'true') {
+            filteredTests.sort(() => Math.random() - 0.5);
+        } else {
+            filteredTests.sort((a, b) => b.severityValue - a.severityValue);
+        }
+        if (count !== 'All') {
+            filteredTests = filteredTests.slice(0, parseInt(count));
+        }
+        const h3 = document.createElement('h3');
+        h3.textContent = component;
+        resultsElement.appendChild(h3);
+        const ul = document.createElement('ul');
+        filteredTests.forEach(test => {
+            const li = document.createElement('li');
+            li.textContent = `${test.Test} (Severity: ${test.Severity}): ${JSON.stringify(test)}`;
+            ul.appendChild(li);
+        });
+        resultsElement.appendChild(ul);
+    }
+});
+
+// And now the front-end HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Suggestion</title>
+</head>
+<body>
+    <form id="testForm">
+        <label>Feature Name: <input type="text" id="featureName" required></label>
+        <br>
+        <label>Select Affected Components:
+            <select id="component1" required>
+                <option value="">--Please choose an option--</option>
+                <option value="Login">Login</option>
+                <option value="Store">Store</option>
+                <option value="TileStyles">Tile Styles</option>
+                <option value="Clubs">Clubs</option>
+                <option value="Profile">Profile</option>
+            </select>
+            <select id="component2">
+                <option value="">--Please choose an option--</option>
+                <option value="Login">Login</option>
+                <option value="Store">Store</option>
+                <option value="TileStyles">Tile Styles</option>
+                <option value="Clubs">Clubs</option>
+                <option value="Profile">Profile</option>
+            </select>
+            <!-- Add more select elements as needed -->
+        </label>
+        <br>
+        <label>How many tests do you want:
+            <select id="count" required>
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="All">All</option>
+            </select>
+        </label>
+        <br>
+        <label>Do you want them by priority or random?:
+            <select id="random" required>
+                <option value="true">Random</option>
+                <option value="false">Priority</option>
+            </select>
+        </label>
+        <br>
+        <button type="submit">Get Tests</button>
+    </form>
+    <div id="results"></div>
+    <script src="script.js"></script>
+</body>
+</html>
